@@ -1,0 +1,20 @@
+﻿
+UnitOfWorks works only with one db context. To have ability to works with more than one db we have to have a class like this:
+
+public Coupled(params IUnitOfWork unitOfWorks)
+{
+    // unitOfWorks
+}
+
+public void SaveChanges()
+{
+    using (var scope = new TransactionScope(TransactionScopeOption.Required,
+                                            new TransactionOptions { IsolationLevel = IsolationLevel.ReadCommitted }))
+    {
+        _contextA.SaveChanges(SaveOptions.DetectChangesBeforeSave);
+        _contextB.SaveChanges(SaveOptions.DetectChangesBeforeSave);
+        scope.Complete();
+        _contextA.AcceptAllChanges();
+        _contextB.AcceptAllChanges(); 
+    }
+}
